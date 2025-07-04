@@ -106,7 +106,7 @@ A robust, extensible backend for task management, designed for production-readin
 
 ### 1. Clone the repository
 ```sh
-git clone <your-repo-url>
+git clone git@github.com:eliteDev8/Sterry_Assesment.git
 cd sterry
 ```
 
@@ -190,7 +190,7 @@ DELETE /tasks/{id}
 | Framework     | Express               | Minimal, flexible, widely adopted, great for REST APIs                   |
 | Database      | PostgreSQL            | ACID compliance, relational modeling, scalability, open source           |
 | ORM           | Sequelize             | Clean data modeling, migrations, validation, easy to switch DBs          |
-| Message Queue | RabbitMQ/Redis        | Decoupled async processing, extensible for integrations                  |
+| Message Queue | RabbitMQ              | Decoupled async processing, extensible for integrations                  |
 | Container     | Docker, Compose       | Consistent dev/prod environments, easy onboarding                        |
 | Docs          | Swagger/OpenAPI       | Industry standard, interactive, supports automation                      |
 | Testing       | Jest, Supertest       | Modern, fast, supports both unit and integration testing                 |
@@ -246,10 +246,14 @@ DELETE /tasks/{id}
 ---
 
 ## 🛠️ Useful Commands
-- **Start the stack:**  
+- **Start the stack:**
   `docker compose up --build`
+- **Database and RabbitMQ connection**
+  `docker compose up -d`
 - **Run tests:**  
   `docker compose run app npm test`
+- **Run Project**
+  `docker compose run app npm start`
 - **Stop everything:**  
   `docker compose down`
 - **View logs:**  
