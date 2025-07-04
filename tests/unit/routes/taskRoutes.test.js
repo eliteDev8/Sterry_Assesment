@@ -1,10 +1,10 @@
 const request = require('supertest');
-const app = require('../../src/app');
-const { Task } = require('../../src/models/task');
-const { publishEvent } = require('../../src/services/queue');
+const app = require('../../../src/app');
+const { Task } = require('../../../src/models/task');
+const { publishEvent } = require('../../../src/services/queue');
 
 // Do NOT mock the whole models/task module, only mock Task methods
-jest.mock('../../src/services/queue');
+jest.mock('../../../src/services/queue');
 
 beforeEach(() => {
   jest.clearAllMocks();

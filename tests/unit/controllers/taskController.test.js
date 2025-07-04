@@ -1,9 +1,9 @@
-const taskController = require('../../src/controllers/taskController');
-const { Task } = require('../../src/models/task');
-const { publishEvent } = require('../../src/services/queue');
+const taskController = require('../../../src/controllers/taskController');
+const { Task } = require('../../../src/models/task');
+const { publishEvent } = require('../../../src/services/queue');
 
-jest.mock('../../src/models/task');
-jest.mock('../../src/services/queue');
+jest.mock('../../../src/models/task');
+jest.mock('../../../src/services/queue');
 
 describe('taskController', () => {
   let req, res, next;
