@@ -309,4 +309,45 @@ This section explains how this README and the project design address the assignm
 
 ---
 
+## ☁️ Cloud Infrastructure (Production)
+
+- **Hosting:** Vercel (for frontend/static), AWS Elastic Beanstalk or Vercel Serverless for Node.js API.
+- **Database:** AWS RDS (PostgreSQL) for managed, scalable, and highly available relational storage.
+- **Object Storage:** AWS S3 for file uploads and attachments.
+- **Environment Variables & Secrets:** Managed via Vercel dashboard or AWS Secrets Manager/Parameter Store.
+- **Logs & Monitoring:** Vercel logs for serverless, AWS CloudWatch for centralized logging, metrics, and alerting.
+- **Queue:** AWS SQS or Amazon MQ for decoupled, reliable message processing.
+
+### Deployment & Secrets Management
+- **CI/CD:** Automated via GitHub Actions or Vercel's built-in CI/CD.
+- **Secrets:** Never stored in code. Managed via Vercel or AWS Secrets Manager.
+- **Access Control:** IAM roles and least-privilege policies for all cloud resources.
+- **Audit:** Regularly review access logs and rotate secrets.
+
+### Cloud Infrastructure Diagram
+
+```mermaid
+flowchart TD
+  User["User (Web/Mobile Client)"]
+  CDN["Vercel CDN / Edge"]
+  API["API Server (Vercel Serverless or AWS Elastic Beanstalk)"]
+  S3["AWS S3 (Object Storage)"]
+  RDS["AWS RDS (PostgreSQL)"]
+  MQ["AWS SQS / Amazon MQ"]
+  Logs["AWS CloudWatch"]
+  Secrets["AWS Secrets Manager"]
+  Docs["Swagger UI / API Docs"]
+
+  User -- HTTPS --> CDN
+  CDN -- HTTPS --> API
+  API -- SQL --> RDS
+  API -- REST --> Docs
+  API -- Publish Events --> MQ
+  API -- Store/Retrieve --> S3
+  API -- Logs --> Logs
+  API -- Secrets --> Secrets
+```
+
+---
+
 **For any questions or deeper architectural discussions, see the codebase, Swagger UI, or contact the project maintainer.** 
