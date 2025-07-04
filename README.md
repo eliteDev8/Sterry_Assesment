@@ -311,12 +311,14 @@ This section explains how this README and the project design address the assignm
 
 ## ☁️ Cloud Infrastructure (Production)
 
-- **Hosting:** Vercel (for frontend/static), AWS Elastic Beanstalk or Vercel Serverless for Node.js API.
-- **Database:** AWS RDS (PostgreSQL) for managed, scalable, and highly available relational storage.
-- **Object Storage:** AWS S3 for file uploads and attachments.
-- **Environment Variables & Secrets:** Managed via Vercel dashboard or AWS Secrets Manager/Parameter Store.
-- **Logs & Monitoring:** Vercel logs for serverless, AWS CloudWatch for centralized logging, metrics, and alerting.
-- **Queue:** AWS SQS or Amazon MQ for decoupled, reliable message processing.
+- **Hosting:** Vercel (API as serverless function or Node.js app).
+- **Database:** AWS RDS (PostgreSQL) for managed, reliable storage.
+- **Object Storage:** AWS S3 (for future file uploads/attachments).
+- **Queue:** AWS SQS or Amazon MQ for async event processing.
+- **Environment Variables & Secrets:** Managed via Vercel dashboard or AWS Secrets Manager.
+- **Logs & Monitoring:** Vercel logs or AWS CloudWatch.
+- **CI/CD:** GitHub Actions for automated tests and deployments.
+- **API Docs:** Swagger UI, deployed with the app.
 
 ### Deployment & Secrets Management
 - **CI/CD:** Automated via GitHub Actions or Vercel's built-in CI/CD.
@@ -330,23 +332,86 @@ This section explains how this README and the project design address the assignm
 flowchart TD
   User["User (Web/Mobile Client)"]
   CDN["Vercel CDN / Edge"]
-  API["API Server (Vercel Serverless or AWS Elastic Beanstalk)"]
-  S3["AWS S3 (Object Storage)"]
+  APIGW["API Gateway (Vercel/CloudFront)"]
+  API["API Server (Vercel Serverless or Node.js/Express)"]
+  S3["AWS S3 (Object Storage, future)"]
   RDS["AWS RDS (PostgreSQL)"]
-  MQ["AWS SQS / Amazon MQ"]
-  Logs["AWS CloudWatch"]
-  Secrets["AWS Secrets Manager"]
+  MQ["AWS SQS / Amazon MQ (Queue)"]
+  Logs["Cloud Logs (Vercel/CloudWatch)"]
+  Secrets["Secrets Manager (Vercel/AWS)"]
+  CI["CI/CD Pipeline (GitHub Actions)"]
   Docs["Swagger UI / API Docs"]
 
   User -- HTTPS --> CDN
-  CDN -- HTTPS --> API
+  CDN -- HTTPS --> APIGW
+  APIGW -- HTTPS --> API
   API -- SQL --> RDS
   API -- REST --> Docs
   API -- Publish Events --> MQ
   API -- Store/Retrieve --> S3
   API -- Logs --> Logs
   API -- Secrets --> Secrets
+  CI -- Deploy --> API
+  CI -- DB Migrations --> RDS
 ```
+
+### Cloud Infrastructure: Detailed Description & Rationale
+
+#### Component Breakdown
+
+- **Vercel CDN / Edge**  
+  Delivers static assets and frontend globally with low latency. Provides edge caching and DDoS protection. Offloads traffic from the API and improves user experience.
+
+- **API Gateway (Vercel/CloudFront)**  
+  Central entry point for all API requests. Handles SSL termination, rate limiting, and (optionally) authentication. Routes requests to the correct backend service (API server).
+
+- **API Server (Vercel Serverless or Node.js/Express)**  
+  Stateless backend that processes all business logic and API requests. Can be deployed as a serverless function (for auto-scaling and cost efficiency) or as a containerized Node.js app. Connects to the database, message queue, and other services.
+
+- **AWS RDS (PostgreSQL)**  
+  Managed, reliable, and scalable relational database. Automated backups, failover, and maintenance. Stores all persistent task data.
+
+- **AWS S3 (Object Storage, future)**  
+  Used for file uploads and attachments (e.g., task-related documents). Scalable, durable, and cost-effective storage.
+
+- **AWS SQS / Amazon MQ (Queue)**  
+  Decouples event-driven processes (e.g., notifications, analytics, integrations). Ensures reliable delivery and processing of background jobs.
+
+- **Cloud Logs (Vercel/CloudWatch)**  
+  Centralized logging and monitoring for all services. Enables alerting, troubleshooting, and auditing.
+
+- **Secrets Manager (Vercel/AWS)**  
+  Securely stores and manages sensitive information (DB credentials, API keys). Prevents secrets from being hardcoded or leaked in code/configs.
+
+- **CI/CD Pipeline (GitHub Actions)**  
+  Automates testing, building, and deployment of the application. Ensures code quality and enables rapid, safe releases. Handles database migrations as part of the deployment process.
+
+- **Swagger UI / API Docs**  
+  Provides interactive, always-up-to-date API documentation for developers and integrators.
+
+---
+
+#### How This Supports Scalability, Security, and Maintainability
+
+- **Scalability:**  
+  Stateless API and serverless deployment allow for automatic scaling based on demand. CDN and API Gateway distribute load and reduce latency. Managed database and queue services scale independently.
+
+- **Security:**  
+  API Gateway and CDN provide DDoS protection and SSL termination. Secrets Manager ensures sensitive data is never exposed in code. IAM roles and least-privilege policies restrict access to resources.
+
+- **Maintainability:**  
+  CI/CD automates testing and deployment, reducing manual errors. Centralized logging and monitoring enable fast troubleshooting and proactive alerting. Infrastructure is modular—components can be upgraded or replaced independently.
+
+- **Production Readiness:**  
+  All components are managed services, reducing operational overhead. Automated backups, failover, and monitoring ensure high availability and reliability. The architecture is cloud-native and ready for future integrations (e.g., third-party tools, analytics, notifications).
+
+---
+
+#### Why This Design?
+
+- **Meets assignment requirements** for a scalable, reliable, and maintainable task management service.
+- **Balances simplicity and extensibility**—only includes what's needed, but is ready for future growth.
+- **Demonstrates leadership-level architectural thinking** by considering security, automation, and real-world operations.
 
 ---
 
