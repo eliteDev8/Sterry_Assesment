@@ -1,0 +1,227 @@
+openapi: 3.0.3
+info:
+  title: Task Management API
+  version: 1.0.0
+  description: API for managing tasks with filtering, sorting, and CRUD operations.
+
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /tasks:
+    post:
+      summary: Create a new task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreate'
+            example:
+              title: "Write documentation"
+              description: "Document the API using OpenAPI and JSDoc."
+              dueDate: "2025-01-01"
+              status: "open"
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: Retrieve a list of all tasks
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: ["open", "in progress", "completed", "blocked"]
+          description: Filter tasks by status
+        - in: query
+          name: dueDate
+          schema:
+            type: string
+            format: date
+          description: Filter tasks by due date
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: ["dueDate", "title"]
+          description: Sort tasks by a specific field
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum: ["asc", "desc"]
+          description: Sort order
+      responses:
+        '200':
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+  /tasks/{id}:
+    get:
+      summary: Retrieve a specific task by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Task found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update an existing task
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdate'
+            example:
+              title: "Update docs"
+              description: "Update the API documentation"
+              dueDate: "2025-02-01"
+              status: "completed"
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a task
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Task deleted successfully
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "b1a2c3d4-e5f6-7890-abcd-1234567890ef"
+        title:
+          type: string
+          example: "Write documentation"
+        description:
+          type: string
+          example: "Document the API using OpenAPI and JSDoc."
+        dueDate:
+          type: string
+          format: date
+          example: "2025-01-01"
+        status:
+          type: string
+          enum: ["open", "in progress", "completed", "blocked"]
+          example: "open"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-01T12:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-01-01T12:00:00Z"
+    TaskCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: "Write documentation"
+        description:
+          type: string
+          example: "Document the API using OpenAPI and JSDoc."
+        dueDate:
+          type: string
+          format: date
+          example: "2025-01-01"
+        status:
+          type: string
+          enum: ["open", "in progress", "completed", "blocked"]
+          example: "open"
+    TaskUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Update docs"
+        description:
+          type: string
+          example: "Update the API documentation"
+        dueDate:
+          type: string
+          format: date
+          example: "2025-02-01"
+        status:
+          type: string
+          enum: ["open", "in progress", "completed", "blocked"]
+          example: "completed"
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Task not found" 

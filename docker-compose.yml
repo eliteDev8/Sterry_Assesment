@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: sterrydb
+      POSTGRES_USER: sterryuser
+      POSTGRES_PASSWORD: sterrypass
+    ports:
+      - '5433:5432'  # Changed from 5432:5432 to 5433:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      - PORT=3000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=sterrydb
+      - DB_USER=sterryuser
+      - DB_PASSWORD=sterrypass
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+    command: npm run start
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+volumes:
+  db_data:
+  rabbitmq_data:
