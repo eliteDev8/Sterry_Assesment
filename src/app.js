@@ -20,7 +20,9 @@ const swaggerDocument = YAML.load(path.join(__dirname, '../openapi.yaml'));
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Initialize RabbitMQ connection
-initializeQueue().catch(console.error);
+if (process.env.NODE_ENV !== 'test') {
+  initializeQueue().catch(console.error);
+}
 
 const PORT = process.env.PORT || 3000;
 
@@ -33,3 +35,4 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 module.exports = app;
+
